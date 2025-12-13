@@ -9,8 +9,8 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
 
-  // Categories with their products
-  const categories = [
+  // Categories with their products - wrapped in useMemo to prevent recreation on every render
+  const categories = useMemo(() => [
     {
       name: 'AI',
       icon: 'Brain',
@@ -93,10 +93,10 @@ export default function Home() {
       color: 'bg-gradient-to-br from-[#9DE4F0] to-[#8AABF2]',
       products: [
         { id: 9, title: 'Quizlet', price: '10.000đ', logo: 'BookOpen', bgColor: 'bg-indigo-600', image: '/products/quizlet.png' },
-        { id: 10, title: 'Figma Edu', price: '90.000đ', logo: 'Figma', bgColor: 'bg-zinc-900' },
-        { id: 11, title: 'IntelliJ Edu', price: '90.000đ', logo: 'Code', bgColor: 'bg-zinc-900' },
-        { id: 12, title: 'Coursera Plus', price: '150.000đ', logo: 'Award', bgColor: 'bg-blue-600', isSoldOut: true },
-        { id: 13, title: 'Grammarly Premium', price: '50.000đ', logo: 'PenTool', bgColor: 'bg-green-600', isSoldOut: true },
+        { id: 10, title: 'Figma Edu', price: '90.000đ', logo: 'Figma', bgColor: 'bg-zinc-900', image: '/mmo-product-image/figma.webp' },
+        { id: 11, title: 'IntelliJ Edu', price: '90.000đ', logo: 'Code', bgColor: 'bg-zinc-900', image: '/mmo-product-image/intelliJ.webp' },
+        { id: 12, title: 'Coursera Plus', price: '150.000đ', logo: 'Award', bgColor: 'bg-blue-600', image: '/mmo-product-image/coursera_plus.webp', isSoldOut: true },
+        { id: 13, title: 'Grammarly Premium', price: '50.000đ', logo: 'PenTool', bgColor: 'bg-green-600', image: '/mmo-product-image/grammally.webp', isSoldOut: true },
       ]
     },
     {
@@ -105,10 +105,10 @@ export default function Home() {
       color: 'bg-gradient-to-br from-[#EEC5EF] via-[#8AABF2] to-[#9DE4F0]',
       products: [
         { id: 14, title: 'Canva (tài khoản cấp)', price: '10.000đ', logo: 'Palette', bgColor: 'bg-gradient-to-br from-cyan-400 via-violet-500 to-pink-500', image: '/products/canva.webp' },
-        { id: 20, title: 'Cursor trial', price: '20.000đ', logo: 'Code', bgColor: 'bg-zinc-900' },
-        { id: 21, title: 'Microsoft 365', price: '30.000đ', logo: 'Package', bgColor: 'bg-white', isSoldOut: true },
-        { id: 22, title: 'CapCut Pro', price: '50.000đ', logo: 'Scissors', bgColor: 'bg-zinc-800', isSoldOut: true },
-        { id: 23, title: 'Notion Plus', price: '40.000đ', logo: 'FileText', bgColor: 'bg-zinc-800', isSoldOut: true },
+        { id: 20, title: 'Cursor trial', price: '20.000đ', logo: 'Code', bgColor: 'bg-zinc-900', image: '/mmo-product-image/cursor_trial.webp' },
+        { id: 21, title: 'Microsoft 365', price: '30.000đ', logo: 'Package', bgColor: 'bg-white', image: '/mmo-product-image/microsoft365_ver2.webp', isSoldOut: true },
+        { id: 22, title: 'CapCut Pro', price: '50.000đ', logo: 'Scissors', bgColor: 'bg-zinc-800', image: '/mmo-product-image/capcut.webp', isSoldOut: true },
+        { id: 23, title: 'Notion Plus', price: '40.000đ', logo: 'FileText', bgColor: 'bg-zinc-800', image: '/mmo-product-image/notion.webp', isSoldOut: true },
       ]
     },
     {
@@ -116,12 +116,12 @@ export default function Home() {
       icon: 'Shield',
       color: 'bg-gradient-to-br from-[#9DE4F0] via-[#8AABF2] to-[#EEC5EF]',
       products: [
-        { id: 24, title: 'Express VPN', price: '20.000đ', logo: 'Shield', bgColor: 'bg-red-600' },
-        { id: 25, title: 'Ariva Security & VPN', price: '60.000đ', logo: 'Lock', bgColor: 'bg-blue-700' },
-        { id: 26, title: 'NordVPN Premium', price: '35.000đ', logo: 'Lock', bgColor: 'bg-blue-700', isSoldOut: true },
+        { id: 24, title: 'Express VPN', price: '20.000đ', logo: 'Shield', bgColor: 'bg-red-600', image: '/mmo-product-image/expressVPN.webp' },
+        { id: 25, title: 'Ariva Security & VPN', price: '60.000đ', logo: 'Lock', bgColor: 'bg-blue-700', image: '/mmo-product-image/avira.webp' },
+        { id: 26, title: 'NordVPN Premium', price: '35.000đ', logo: 'Lock', bgColor: 'bg-blue-700', image: '/mmo-product-image/NordVPN.webp', isSoldOut: true },
       ]
     },
-  ];
+  ], []);
 
   // Filter categories and products based on search query
   const filteredCategories = useMemo(() => {

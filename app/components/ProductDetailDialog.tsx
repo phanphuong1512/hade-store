@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { X, Shield, AlertCircle, CheckSquare, Ban } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { X, Shield, AlertCircle, CheckSquare, Ban, Minus, Plus, Check } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import Image from 'next/image';
 
@@ -39,6 +39,64 @@ export default function ProductDetailDialog({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const IconComponent = (Icons as any)[logo] || Icons.Box;
   const isWhiteBg = bgColor.includes('white');
+  
+  const [quantity, setQuantity] = useState(1);
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [showCopiedNotification, setShowCopiedNotification] = useState(false);
+
+  const MESSENGER_URL = 'https://www.facebook.com/messages/t/939214932606743';
+
+  // Reset quantity when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      setQuantity(1);
+      setSelectedOption(0);
+      setShowCopiedNotification(false);
+    }
+  }, [isOpen]);
+
+  // Calculate total price
+  const calculateTotal = () => {
+    if (pricingOptions.length === 0) return '0đ';
+    const priceStr = pricingOptions[selectedOption].price;
+    const priceNum = parseInt(priceStr.replace(/\D/g, ''));
+    const total = priceNum * quantity;
+    return total.toLocaleString('vi-VN') + 'đ';
+  };
+
+  // Handle purchase - copy text and redirect to messenger
+  const handlePurchase = async () => {
+    const selectedPricing = pricingOptions[selectedOption];
+    const orderText = `${title}
+${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
+    
+    try {
+      await navigator.clipboard.writeText(orderText);
+      setShowCopiedNotification(true);
+      
+      // Redirect to messenger after 3 seconds
+      setTimeout(() => {
+        window.open(MESSENGER_URL, '_blank');
+        setShowCopiedNotification(false);
+        onClose();
+      }, 3000);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = orderText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      setShowCopiedNotification(true);
+      setTimeout(() => {
+        window.open(MESSENGER_URL, '_blank');
+        setShowCopiedNotification(false);
+        onClose();
+      }, 3000);
+    }
+  };
 
   // Prevent body scroll when dialog is open
   useEffect(() => {
@@ -172,29 +230,98 @@ export default function ProductDetailDialog({
                 {pricingOptions.slice(0, 4).map((option, index) => (
                   <button
                     key={index}
-                    className="group relative py-5 px-4 bg-[#8AABF2]/5 border border-[#8AABF2]/10 rounded-2xl hover:border-[#9DE4F0]/50 hover:bg-[#9DE4F0]/10 transition-all duration-300 text-center overflow-hidden"
+                    onClick={() => setSelectedOption(index)}
+                    className={`group relative py-5 px-4 border rounded-2xl transition-all duration-300 text-center overflow-hidden ${
+                      selectedOption === index
+                        ? 'bg-[#9DE4F0]/15 border-[#9DE4F0]/50 ring-2 ring-[#9DE4F0]/30'
+                        : 'bg-[#8AABF2]/5 border-[#8AABF2]/10 hover:border-[#9DE4F0]/50 hover:bg-[#9DE4F0]/10'
+                    }`}
                   >
+                    {/* Selected indicator */}
+                    {selectedOption === index && (
+                      <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#9DE4F0]" />
+                    )}
+                    
                     {/* Hover glow effect */}
                     <div className="absolute inset-0 bg-gradient-to-br from-[#9DE4F0]/0 to-[#EEC5EF]/0 group-hover:from-[#9DE4F0]/5 group-hover:to-[#EEC5EF]/5 transition-all duration-300" />
                     
-                    <span className="relative block text-[#8AABF2]/70 text-sm mb-1 group-hover:text-[#9DE4F0] transition-colors">
+                    <span className={`relative block text-sm mb-1 transition-colors ${
+                      selectedOption === index ? 'text-[#9DE4F0]' : 'text-[#8AABF2]/70 group-hover:text-[#9DE4F0]'
+                    }`}>
                       {option.duration}
                     </span>
-                    <span className="relative block text-white font-bold text-xl sm:text-2xl group-hover:text-[#9DE4F0] transition-colors">
+                    <span className={`relative block font-bold text-xl sm:text-2xl transition-colors ${
+                      selectedOption === index ? 'text-[#9DE4F0]' : 'text-white group-hover:text-[#9DE4F0]'
+                    }`}>
                       {option.price}
                     </span>
                   </button>
                 ))}
               </div>
 
+              {/* Quantity selector */}
+              <div className="flex items-center justify-between p-4 bg-[#8AABF2]/5 border border-[#8AABF2]/10 rounded-2xl">
+                <span className="text-[#8AABF2]/80 text-sm">Số lượng</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    disabled={quantity <= 1}
+                    className="w-9 h-9 rounded-xl bg-[#8AABF2]/10 hover:bg-[#8AABF2]/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                  >
+                    <Minus className="w-4 h-4 text-[#9DE4F0]" />
+                  </button>
+                  <span className="w-10 text-center text-white font-semibold text-lg">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(Math.min(99, quantity + 1))}
+                    disabled={quantity >= 99}
+                    className="w-9 h-9 rounded-xl bg-[#8AABF2]/10 hover:bg-[#8AABF2]/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                  >
+                    <Plus className="w-4 h-4 text-[#9DE4F0]" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Total price */}
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#9DE4F0]/10 via-[#8AABF2]/10 to-[#EEC5EF]/10 border border-[#8AABF2]/20 rounded-2xl">
+                <span className="text-white font-medium">Tổng cộng</span>
+                <span className="text-[#9DE4F0] font-bold text-2xl">{calculateTotal()}</span>
+              </div>
+
               {/* CTA Button */}
-              <button className="w-full py-4 sm:py-5 bg-gradient-to-r from-[#9DE4F0] via-[#8AABF2] to-[#EEC5EF] hover:opacity-90 text-[#040A26] font-semibold text-lg rounded-2xl transition-all duration-300 shadow-lg shadow-[#8AABF2]/30 hover:shadow-[#8AABF2]/50 hover:scale-[1.02] active:scale-[0.98] mt-auto">
+              <button 
+                onClick={handlePurchase}
+                className="w-full py-4 sm:py-5 bg-gradient-to-r from-[#9DE4F0] via-[#8AABF2] to-[#EEC5EF] hover:opacity-90 text-[#040A26] font-semibold text-lg rounded-2xl transition-all duration-300 shadow-lg shadow-[#8AABF2]/30 hover:shadow-[#8AABF2]/50 hover:scale-[1.02] active:scale-[0.98] mt-auto"
+              >
                 Mua hàng
               </button>
             </div>
 
           </div>
         </div>
+
+        {/* Copied Notification Overlay */}
+        {showCopiedNotification && (
+          <div className="absolute inset-0 bg-[#040A26]/95 backdrop-blur-md flex flex-col items-center justify-center z-20 animate-in fade-in duration-300">
+            {/* Success Icon */}
+            <div className="w-24 h-24 rounded-full border-4 border-green-500 flex items-center justify-center mb-6 animate-in zoom-in duration-300">
+              <Check className="w-12 h-12 text-green-500" strokeWidth={3} />
+            </div>
+            
+            {/* Title */}
+            <h3 className="text-white text-2xl font-bold mb-3">Tin nhắn đã được copy</h3>
+            
+            {/* Description */}
+            <p className="text-[#8AABF2]/80 text-center px-8 mb-6">
+              Hãy paste tin nhắn đó và gửi đến Freemium (Messenger) sắp được mở
+            </p>
+
+            {/* Loading indicator */}
+            <div className="flex items-center gap-2 text-[#9DE4F0]/60 text-sm">
+              <div className="w-4 h-4 border-2 border-[#9DE4F0]/30 border-t-[#9DE4F0] rounded-full animate-spin" />
+              <span>Đang chuyển hướng...</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
