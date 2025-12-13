@@ -43,6 +43,7 @@ export default function ProductDetailDialog({
   const [quantity, setQuantity] = useState(1);
   const [selectedOption, setSelectedOption] = useState(0);
   const [showCopiedNotification, setShowCopiedNotification] = useState(false);
+  const [countdown, setCountdown] = useState(2);
 
   const MESSENGER_URL = 'https://www.facebook.com/messages/t/939214932606743';
 
@@ -52,6 +53,7 @@ export default function ProductDetailDialog({
       setQuantity(1);
       setSelectedOption(0);
       setShowCopiedNotification(false);
+      setCountdown(2);
     }
   }, [isOpen]);
 
@@ -73,13 +75,20 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
     try {
       await navigator.clipboard.writeText(orderText);
       setShowCopiedNotification(true);
+      setCountdown(2);
       
-      // Redirect to messenger after 3 seconds
-      setTimeout(() => {
-        window.open(MESSENGER_URL, '_blank');
-        setShowCopiedNotification(false);
-        onClose();
-      }, 3000);
+      // Start countdown
+      let count = 2;
+      const countdownInterval = setInterval(() => {
+        count -= 1;
+        setCountdown(count);
+        if (count <= 0) {
+          clearInterval(countdownInterval);
+          window.open(MESSENGER_URL, '_blank');
+          setShowCopiedNotification(false);
+          onClose();
+        }
+      }, 1000);
     } catch {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
@@ -90,11 +99,19 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
       document.body.removeChild(textArea);
       
       setShowCopiedNotification(true);
-      setTimeout(() => {
-        window.open(MESSENGER_URL, '_blank');
-        setShowCopiedNotification(false);
-        onClose();
-      }, 3000);
+      setCountdown(2);
+      
+      let count = 2;
+      const countdownInterval = setInterval(() => {
+        count -= 1;
+        setCountdown(count);
+        if (count <= 0) {
+          clearInterval(countdownInterval);
+          window.open(MESSENGER_URL, '_blank');
+          setShowCopiedNotification(false);
+          onClose();
+        }
+      }, 1000);
     }
   };
 
@@ -316,9 +333,11 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
             </p>
 
             {/* Loading indicator */}
-            <div className="flex items-center gap-2 text-[#9DE4F0]/60 text-sm">
-              <div className="w-4 h-4 border-2 border-[#9DE4F0]/30 border-t-[#9DE4F0] rounded-full animate-spin" />
-              <span>Đang chuyển hướng...</span>
+            <div className="flex items-center gap-2 text-[#9DE4F0] text-lg font-medium">
+              <span>Chuyển hướng sau</span>
+              <span className="w-8 h-8 rounded-full bg-[#9DE4F0]/20 flex items-center justify-center text-[#9DE4F0] font-bold animate-pulse">
+                {countdown}
+              </span>
             </div>
           </div>
         )}

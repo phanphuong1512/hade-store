@@ -102,7 +102,7 @@ export default function Home() {
     {
       name: 'Hiệu suất',
       icon: 'Zap',
-      color: 'bg-gradient-to-br from-[#EEC5EF] via-[#8AABF2] to-[#9DE4F0]',
+      color: 'bg-gradient-to-br from-[#EEC5EF] via-[#8AABF2] to-[#9DE4F0]', 
       products: [
         { id: 14, title: 'Canva (tài khoản cấp)', price: '10.000đ', logo: 'Palette', bgColor: 'bg-gradient-to-br from-cyan-400 via-violet-500 to-pink-500', image: '/products/canva.webp' },
         { id: 20, title: 'Cursor trial', price: '20.000đ', logo: 'Code', bgColor: 'bg-zinc-900', image: '/mmo-product-image/cursor_trial.webp' },
