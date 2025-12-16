@@ -44,6 +44,14 @@ export default function ProductDetailDialog({
   const [selectedOption, setSelectedOption] = useState(0);
   const [showCopiedNotification, setShowCopiedNotification] = useState(false);
   const [countdown, setCountdown] = useState(2);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const updateIsMobile = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth <= 768);
+    updateIsMobile();
+    window.addEventListener('resize', updateIsMobile);
+    return () => window.removeEventListener('resize', updateIsMobile);
+  }, []);
 
   const MESSENGER_URL = 'https://www.facebook.com/messages/t/939214932606743';
 
@@ -77,14 +85,18 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
       setShowCopiedNotification(true);
       setCountdown(2);
       
-      // Start countdown
+          // Start countdown
       let count = 2;
       const countdownInterval = setInterval(() => {
         count -= 1;
         setCountdown(count);
         if (count <= 0) {
           clearInterval(countdownInterval);
-          window.open(MESSENGER_URL, '_blank');
+          if (isMobile) {
+            window.location.href = MESSENGER_URL;
+          } else {
+            window.open(MESSENGER_URL, '_blank');
+          }
           setShowCopiedNotification(false);
           onClose();
         }
@@ -107,7 +119,11 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
         setCountdown(count);
         if (count <= 0) {
           clearInterval(countdownInterval);
-          window.open(MESSENGER_URL, '_blank');
+          if (isMobile) {
+            window.location.href = MESSENGER_URL;
+          } else {
+            window.open(MESSENGER_URL, '_blank');
+          }
           setShowCopiedNotification(false);
           onClose();
         }
