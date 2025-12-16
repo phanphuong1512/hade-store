@@ -165,6 +165,7 @@ export default function CategoryRow({
             rounded-xl overflow-hidden cursor-pointer 
             transition-all duration-300 hover:scale-[1.02]
             flex flex-col items-center justify-center
+            sm:w-3/4 mx-auto
             min-h-[180px]
             ${categoryColor}
           `}
@@ -191,7 +192,7 @@ export default function CategoryRow({
         {/* Empty placeholders */}
         {visibleProducts.length < productsPerPage && 
           Array.from({ length: productsPerPage - visibleProducts.length }).map((_, i) => (
-            <div key={`placeholder-${categoryName}-${i}`} className="rounded-xl bg-zinc-900/30 min-h-[180px]" />
+            <div key={`placeholder-${categoryName}-${i}`} className="rounded-xl bg-zinc-900/30 sm:w-3/4 mx-auto min-h-[180px]" />
           ))
         }
       </div>

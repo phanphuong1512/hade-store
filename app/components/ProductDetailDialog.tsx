@@ -71,24 +71,46 @@ export default function ProductDetailDialog({
     const selectedPricing = pricingOptions[selectedOption];
     const orderText = `${title}
 ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
-    
+
+    // Open a popup synchronously on user gesture to avoid mobile popup blocking
+    let popup: Window | null = null;
     try {
-      await navigator.clipboard.writeText(orderText);
+      popup = window.open('', '_blank');
+    } catch (e) {
+      popup = null;
+    }
+
+    const startCountdown = () => {
       setShowCopiedNotification(true);
       setCountdown(2);
-      
-      // Start countdown
+
       let count = 2;
       const countdownInterval = setInterval(() => {
         count -= 1;
         setCountdown(count);
         if (count <= 0) {
           clearInterval(countdownInterval);
-          window.open(MESSENGER_URL, '_blank');
+
+          // If the popup is available, navigate it; otherwise open a new tab/window
+          if (popup && !popup.closed) {
+            try {
+              popup.location.href = MESSENGER_URL;
+            } catch {
+              window.open(MESSENGER_URL, '_blank');
+            }
+          } else {
+            window.open(MESSENGER_URL, '_blank');
+          }
+
           setShowCopiedNotification(false);
           onClose();
         }
       }, 1000);
+    };
+
+    try {
+      await navigator.clipboard.writeText(orderText);
+      startCountdown();
     } catch {
       // Fallback for older browsers
       const textArea = document.createElement('textarea');
@@ -97,21 +119,8 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
-      
-      setShowCopiedNotification(true);
-      setCountdown(2);
-      
-      let count = 2;
-      const countdownInterval = setInterval(() => {
-        count -= 1;
-        setCountdown(count);
-        if (count <= 0) {
-          clearInterval(countdownInterval);
-          window.open(MESSENGER_URL, '_blank');
-          setShowCopiedNotification(false);
-          onClose();
-        }
-      }, 1000);
+
+      startCountdown();
     }
   };
 
