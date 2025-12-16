@@ -53,7 +53,16 @@ export default function ProductDetailDialog({
     return () => window.removeEventListener('resize', updateIsMobile);
   }, []);
 
-  const MESSENGER_URL = 'https://www.facebook.com/messages/t/939214932606743';
+  const MESSENGER_WEB = 'https://www.facebook.com/messages/t/939214932606743';
+  const MESSENGER_APP = 'fb-messenger://user-thread/939214932606743';
+
+  const openMessengerOnMobile = () => {
+    // Try to open native Messenger app; fallback to web if it doesn't open
+    window.location.href = MESSENGER_APP;
+    setTimeout(() => {
+      window.location.href = MESSENGER_WEB;
+    }, 1200);
+  };
 
   // Reset quantity when dialog opens
   useEffect(() => {
@@ -93,9 +102,9 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
         if (count <= 0) {
           clearInterval(countdownInterval);
           if (isMobile) {
-            window.location.href = MESSENGER_URL;
+            openMessengerOnMobile();
           } else {
-            window.open(MESSENGER_URL, '_blank');
+            window.open(MESSENGER_WEB, '_blank');
           }
           setShowCopiedNotification(false);
           onClose();
@@ -120,9 +129,9 @@ ${selectedPricing.duration} x ${quantity} - ${calculateTotal()}`;
         if (count <= 0) {
           clearInterval(countdownInterval);
           if (isMobile) {
-            window.location.href = MESSENGER_URL;
+            openMessengerOnMobile();
           } else {
-            window.open(MESSENGER_URL, '_blank');
+            window.open(MESSENGER_WEB, '_blank');
           }
           setShowCopiedNotification(false);
           onClose();
